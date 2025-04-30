@@ -7,7 +7,6 @@ _driver = GraphDatabase.driver(
 )
 
 def _get_session():
-    # explicitly target your Academic World database
     return _driver.session(database="academicworld")
 
 def get_all_faculty():

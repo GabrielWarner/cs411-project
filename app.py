@@ -1,5 +1,6 @@
-from dash import Dash, html, dcc, Input, Output
+from dash import Dash, html, dcc, Input, Output, State
 import plotly.express as px
+from mongodb_utils import get_notes_for_faculty, add_note_for_faculty
 
 from neo4j_utils import (
     get_all_faculty,
@@ -24,20 +25,46 @@ app.layout = html.Div([
     html.H3("Top Collaborators", style={"marginTop": "2rem"}),
     dcc.Graph(id="coauthor-chart", style={"width": "500px", "height": "400px"}),
 
+    html.H3("Faculty Notes", style={"marginTop": "2rem"}),
+
+    dcc.Textarea(
+        id="note-input",
+        placeholder="Type your note here…",
+        style={"width": "400px", "height": "80px"}
+    ),
+
+    html.Button(
+        "Add Note",
+        id="submit-note",
+        n_clicks=0,
+        style={"marginLeft": "1rem", "verticalAlign": "top"}
+    ),
+
+    html.Ul(
+        id="notes-list",
+        style={"marginTop": "1rem", "maxWidth": "600px"}
+    ),
 ], style={"padding": "2rem"})
 
 
 @app.callback(
     Output("faculty-profile-div", "children"),
     Output("coauthor-chart", "figure"),
-    Input("faculty-dropdown", "value")
+    Output("notes-list", "children"),
+    Output("note-input", "value"),
+    Input("faculty-dropdown", "value"),
+    Input("submit-note", "n_clicks"),
+    State("note-input", "value"),
+    State("faculty-dropdown", "value"),
 )
-def update_faculty_info(name):
+def update_faculty_info(name, n_clicks, note_text, current_faculty):
     if not name:
         empty_fig = px.bar(title="Select a faculty above")
         return (
             html.Div("Please select a faculty member above."),
-            empty_fig
+            empty_fig,
+            [],
+            ""
         )
 
     profile = get_faculty_profile(name)
@@ -70,7 +97,15 @@ def update_faculty_info(name):
         )
         fig.update_layout(margin={"t": 40, "b": 20, "l": 20, "r": 20})
 
-    return profile_div, fig
+    notes = get_notes_for_faculty(name)
+    notes_list = [html.Li(f"[{note['time'].strftime('%Y-%m-%d %H:%M')}] {note['text']}") for note in notes]
+
+    if n_clicks and note_text and current_faculty:
+        add_note_for_faculty(current_faculty, note_text)
+        notes_list.insert(0, html.Li(note_text))
+        note_text = ""
+
+    return profile_div, fig, notes_list, note_text
 
 
 if __name__ == "__main__":
