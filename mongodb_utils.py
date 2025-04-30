@@ -1,10 +1,10 @@
 from pymongo import MongoClient
 from datetime import datetime
 
-# 1) Connect to your local MongoDB (adjust URI/db name as needed)
+
 _client = MongoClient("mongodb://localhost:27017")
-_db     = _client["academicworld"]       # your Mongo database
-_notes  = _db["faculty_notes"]           # new collection for notes
+_db     = _client["academicworld"]
+_notes  = _db["faculty_notes"]
 
 def get_notes_for_faculty(faculty_name: str):
     """
