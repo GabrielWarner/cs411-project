@@ -1,14 +1,10 @@
 import mysql.connector
 from contextlib import contextmanager
+from config import MYSQL_CONFIG
 
 @contextmanager
 def get_db_connection():
-    conn = mysql.connector.connect(
-        host="localhost",
-        user="root",
-        password="12345678",
-        database="academicworld"
-    )
+    conn = mysql.connector.connect(**MYSQL_CONFIG)
     try:
         yield conn
     finally:
