@@ -1,5 +1,7 @@
 from dash import Dash, html, dcc, Input, Output, State
 import plotly.express as px
+import plotly.io as pio
+pio.templates.default = "plotly_dark"
 from mongodb_utils import get_notes_for_faculty, add_note_for_faculty
 from mysql_utils import (
     get_publications_per_year,
@@ -17,9 +19,10 @@ app.layout = html.Div([
         html.H1("Academic Research Explorer"),
         dcc.Dropdown(
             id="faculty-dropdown",
+            className="dark-dropdown",
             options=[{"label": n, "value": n} for n in get_all_faculty()],
             placeholder="Select a faculty member…",
-            style={"width": "300px", "margin": "1rem auto 2rem"}
+            style={"width": "300px", "margin": "1rem auto 2rem", "color" : "black"}
         ),
     ], style={"textAlign": "center"}),
 
@@ -77,18 +80,17 @@ app.layout = html.Div([
 
             html.Div([
                 html.H3("Review Papers"),
-                dcc.Dropdown(
-                    id="paper-dropdown",
-                    options=[],
-                    placeholder="Select a paper to mark reviewed",
-                    style={"width": "100%"}
-                ),
-                html.Button(
-                    "Mark Reviewed",
-                    id="review-button",
-                    n_clicks=0,
-                    style={"marginTop": "0.5rem"}
-                ),
+            dcc.Dropdown(
+                id="paper-dropdown",
+                className="dark-dropdown",             # ← add this
+                options=[],
+                placeholder="Select a paper to mark reviewed",
+                style={"width": "100%", "color": "#fff"}  # force white text
+            ),
+            html.Button("Mark Reviewed", id="review-button",
+                        n_clicks=0,
+                        className="dark-button",
+                        style={"marginTop": "0.5rem"}),
                 html.Ul(
                     id="reviewed-list",
                     style={"marginTop": "1rem"}
@@ -281,32 +283,40 @@ app.index_string = '''
         {%favicon%}
         {%css%}
         <style>
-            .grid-item {
-                background: white;
-                padding: 20px;
-                border-radius: 8px;
-                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            }
             body {
-                background: #f5f5f5;
+                background: #121212;
+                color: #e0e0e0;
                 margin: 0;
                 font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
             }
-            h3 {
-                margin-top: 0;
-                margin-bottom: 1rem;
-                color: #2c3e50;
+            .grid-item {
+                background: #1e1e1e;
+                color: #e0e0e0;
+                padding: 20px;
+                border-radius: 8px;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.5);
             }
+            h1, h3 {
+                color: #ffffff;
+            }
+            /* Dropdowns, textareas */
+            .Select-control,
+            textarea {
+                background: #2a2a2a !important;
+                color: #e0e0e0 !important;
+                border: 1px solid #444 !important;
+            }
+            /* Buttons */
             button {
-                background-color: #3498db;
-                color: white;
+                background-color: #2979ff;
+                color: #ffffff;
                 border: none;
                 padding: 8px 16px;
                 border-radius: 4px;
                 cursor: pointer;
             }
             button:hover {
-                background-color: #2980b9;
+                background-color: #5393ff;
             }
         </style>
     </head>
